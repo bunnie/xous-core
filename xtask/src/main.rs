@@ -319,8 +319,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let signal = "signal".to_string();
             pkgs.push(&signal);
             generate_app_menus(&vec!["signal".to_string()]);
-            run(false, &pkgs, Some(&["--features", "u32_backend"])
-        )?},
+            /*build_hw_image(false,
+                Some("./precursors/soc.svd".to_string()),
+                &pkgs,
+                lkey, kkey, Some(&["--features", "u32_backend"]), &[], None)?*/
+            run(false, &pkgs, Some(&["--features", "u32_backend"]))?
+        },
         Some("run") => {
             let mut args = env::args();
             args.nth(1);
