@@ -21,7 +21,7 @@ use structopt::StructOpt;
 use url::Url;
 
 use crate::{ShellCmdApi,CommonEnv};
-use xous_ipc::String;
+//use xous_ipc::String;
 use xous::{MessageEnvelope, Message};
 
 
@@ -43,8 +43,8 @@ impl Cli {
 impl<'a> ShellCmdApi<'a> for Cli {
     cmd_api!(cli);
     
-    fn process(&mut self, args: String::<1024>, env: &mut CommonEnv) -> Result<Option<String::<1024>>, xous::Error> {
-        let mut ret = String::<1024>::new();
+    fn process(&mut self, args: xous_ipc::String::<1024>, env: &mut CommonEnv) -> Result<Option<xous_ipc::String::<1024>>, xous::Error> {
+        let mut ret = xous_ipc::String::<1024>::new();
         log::info!("callback unhandled message {:?}", ret);
         Ok(None)
     }
@@ -339,6 +339,7 @@ async fn main() -> anyhow::Result<()> {
         Subcommand::UpdateContact => unimplemented!(),
         Subcommand::ListGroups => unimplemented!(),
         Subcommand::ListContacts => {
+            /*
             for contact in manager.get_contacts()? {
                 if let Contact {
                     name,
@@ -353,7 +354,7 @@ async fn main() -> anyhow::Result<()> {
                 {
                     println!("{} / {} / {}", uuid, name, phonenumber);
                 }
-            }
+            }*/
         }
         Subcommand::Whoami => {
             println!("{:?}", &manager.whoami().await?)

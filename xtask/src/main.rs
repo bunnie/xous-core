@@ -58,7 +58,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "susres",
         "codec",
         "sha2:0.9.8",
-        "engine-25519",
+        //"engine-25519",
         "spinor",
         "root-keys",
         "jtag",
