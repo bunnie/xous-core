@@ -180,8 +180,10 @@ fn socket_crash() {
                 },
                 Ok(mut stream) => {
                     tp.execute(move || {
+                        let mut count = 0;
                         loop {
-                            IoWrite::write(&mut stream, "hello!\n".as_bytes());
+                            IoWrite::write(&mut stream, format!("hello! {}\n", count).as_bytes());
+                            count += 1;
                         }
                     });
                 }
