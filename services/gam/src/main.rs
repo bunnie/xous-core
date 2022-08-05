@@ -41,7 +41,7 @@ fn main () -> ! {
     wrapped_main();
 
     #[cfg(feature="ditherpunk")]
-    let stack_size = 1024 * 1024;
+    let stack_size = 1024 * 2048;
     #[cfg(feature="ditherpunk")]
     std::thread::Builder::new()
         .stack_size(stack_size)
@@ -54,6 +54,14 @@ fn wrapped_main() -> ! {
     log_server::init_wait().unwrap();
     log::set_max_level(log::LevelFilter::Info);
     info!("my PID is {}", xous::process::id());
+
+    const HEAP_LARGER_LIMIT: usize = 2048 * 1024;
+    let new_limit = HEAP_LARGER_LIMIT;
+    let _result = xous::rsyscall(xous::SysCall::AdjustProcessLimit(
+        xous::Limits::HeapMaximum as usize,
+        0,
+        new_limit,
+    ));
 
     let xns = xous_names::XousNames::new().unwrap();
     // unlimited connections allowed; this is a gateway server

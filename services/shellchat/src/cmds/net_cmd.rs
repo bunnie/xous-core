@@ -287,10 +287,15 @@ impl<'a> ShellCmdApi<'a> for NetCmd {
                         }
                     }
                 }
-                #[cfg(feature="ditherpunk")] 
+                #[cfg(feature="nettest")]
+                "test" => {
+                    crate::nettests::start_batch_tests();
+                    write!(ret, "Net batch tests started...").ok();
+                }
+                #[cfg(feature="ditherpunk")]
                 "image" => {
                     // use std::io::BufRead; // not implemented yet!
-                    if let Some(mut url) = tokens.next() {                
+                    if let Some(url) = tokens.next() {
                         match url.split_once('/') {
                             Some((host, path)) => {
                                 match TcpStream::connect((host, 80)) {
@@ -310,7 +315,7 @@ impl<'a> ShellCmdApi<'a> for NetCmd {
                                         log::info!("fetching response....");
                                         // let mut reader = std::io::BufReader::new(&mut stream);
                                         log::info!("trying to read entire response...");
-                                        
+
                                         let mut buf = Vec::<u8>::new();
                                         let mut byte = [0u8; 1];
                                         let mut content_length = 0;
@@ -331,7 +336,7 @@ impl<'a> ShellCmdApi<'a> for NetCmd {
                                                    log::info!("found end of header after {} lines.", line_count);
                                                    break;
                                                 },
-                                                1024.. => {                                                
+                                                1024.. => {
                                                     let line = std::string::String::from_utf8_lossy(&buf);
                                                     log::warn!("header contained line > 4k {:?}", line);
                                                     break;
@@ -352,23 +357,30 @@ impl<'a> ShellCmdApi<'a> for NetCmd {
                                                     _ => {}
                                                 }
                                             };
-                                            buf.clear();                                            
+                                            buf.clear();
                                         }
-                                        
+
                                         if content_length > 0 {
                                             log::info!("heap size: {}", heap_usage());
+                                            let start = env.ticktimer.elapsed_ms();
                                             let mut png = DecodePng::new(stream).expect("png decode failed");
+                                            log::info!("png decoded in {}ms", env.ticktimer.elapsed_ms() - start);
                                             const BORDER: u32 = 3;
                                             let modal_size = gam::Point::new(
-                                                 (gam::IMG_MODAL_WIDTH - 2 * BORDER) as i16, 
+                                                 (gam::IMG_MODAL_WIDTH - 2 * BORDER) as i16,
                                                  (gam::IMG_MODAL_HEIGHT - 2 * BORDER) as i16
                                             );
+                                            log::info!("bitmap created");
+                                            let start = env.ticktimer.elapsed_ms();
                                             let bm = gam::Bitmap::from_png(&mut png, Some(modal_size));
-                                            
+                                            log::info!("converted to bitmap in {}ms", env.ticktimer.elapsed_ms() - start);
+
                                             log::info!("heap size: {}", heap_usage());
                                             let modals = modals::Modals::new(&env.xns).unwrap();
+                                            log::info!("showing image");
+                                            let start = env.ticktimer.elapsed_ms();
                                             modals.show_image(bm).expect("show image modal failed");
-                                                
+                                            log::info!("done in {} ms", env.ticktimer.elapsed_ms() - start);
                                         } else {
                                             write!(ret, "content-length was 0, no image read").unwrap();
                                         }

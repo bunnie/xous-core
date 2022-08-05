@@ -45,6 +45,9 @@ use cmds::*;
 
 mod oqc_test;
 
+#[cfg(feature="nettest")]
+mod nettests;
+
 #[cfg(feature="tts")]
 use locales::t;
 #[cfg(feature="tts")]
@@ -375,6 +378,14 @@ fn wrapped_main() -> ! {
     log_server::init_wait().unwrap();
     log::set_max_level(log::LevelFilter::Info);
     info!("my PID is {}", xous::process::id());
+
+    const HEAP_LARGER_LIMIT: usize = 2048 * 1024;
+    let new_limit = HEAP_LARGER_LIMIT;
+    let _result = xous::rsyscall(xous::SysCall::AdjustProcessLimit(
+        xous::Limits::HeapMaximum as usize,
+        0,
+        new_limit,
+    ));
 
     let xns = xous_names::XousNames::new().unwrap();
     // unlimited connections allowed, this is a user app and it's up to the app to decide its policy
