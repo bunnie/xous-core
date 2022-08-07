@@ -361,7 +361,7 @@ impl<'a> ShellCmdApi<'a> for NetCmd {
                                         if content_length > 0 {
                                             log::info!("heap size: {}", heap_usage());
                                             let start = env.ticktimer.elapsed_ms();
-                                            let mut png = DecodePng::new(stream).expect("png decode failed");
+                                            let mut png = DecodePng::new(reader).expect("png decode failed");
                                             log::info!("png decoded in {}ms", env.ticktimer.elapsed_ms() - start);
                                             const BORDER: u32 = 3;
                                             let modal_size = gam::Point::new(
